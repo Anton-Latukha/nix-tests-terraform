@@ -23,40 +23,29 @@ provider "docker" {
 #### Funcking Images
 
 resource "docker_image" "debian" {
-  name = "debian"
+  name = "debian:latest"
 }
 
-# resource "docker_image" "ubuntu" {
-#   name = "ubuntu:latest"
-# }
+resource "docker_image" "ubuntu" {
+  name = "ubuntu:latest"
+}
 
+resource "docker_image" "centos" {
+  name = "centos:latest"
+}
 
-# resource "docker_image" "ubuntu" {
-#   name = "ubuntu:latest"
-# }
+resource "docker_image" "archlinux" {
+  name = "base/archlinux:latest"
+}
 
+resource "docker_image" "alpine" {
+  name = "alpine:latest"
+}
 
-# resource "docker_image" "ubuntu" {
-#   name = "ubuntu:latest"
-# }
+resource "docker_image" "opensuse" {
+  name = "opensuse/leap"
+}
 
-
-# resource "docker_image" "ubuntu" {
-#   name = "ubuntu:latest"
-# }
-
-
-# resource "docker_image" "ubuntu" {
-#   name = "ubuntu:latest"
-# }
-
-
-# resource "docker_image" "ubuntu" {
-#   name = "ubuntu:latest"
-# }
-
-
-# resource "docker_image" "ubuntu" {
-#   name = "ubuntu:latest"
-# }
-
+resource "docker_image" "slackware" {
+  name = "vbatts/slackware"
+}
