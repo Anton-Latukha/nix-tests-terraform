@@ -51,7 +51,38 @@ resource "docker_image" "slackware" {
 }
 
 #### Start containers
+
+resource "docker_container" "nixInstTestDebian" {
+  name  = "nixInstTestDebian"
+  image = "${docker_image.debian.latest}"
+}
+
 resource "docker_container" "nixInstTestUbuntu" {
   name  = "nixInstTestUbuntu"
   image = "${docker_image.ubuntu.latest}"
+}
+
+resource "docker_container" "nixInstTestCentos" {
+  name  = "nixInstTestCentos"
+  image = "${docker_image.centos.latest}"
+}
+
+resource "docker_container" "nixInstTestArchlinux" {
+  name  = "nixInstTestArchlinux"
+  image = "${docker_image.archlinux.latest}"
+}
+
+resource "docker_container" "nixInstTestAlpine" {
+  name  = "nixInstTestAlpine"
+  image = "${docker_image.alpine.latest}"
+}
+
+resource "docker_container" "nixInstTestOpensuse" {
+  name  = "nixInstTestOpensuse"
+  image = "${docker_image.opensuse.latest}"
+}
+
+resource "docker_container" "nixInstTestSlackware" {
+  name  = "nixInstTestSlackware"
+  image = "${docker_image.slackware.latest}"
 }
