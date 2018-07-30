@@ -49,3 +49,9 @@ resource "docker_image" "opensuse" {
 resource "docker_image" "slackware" {
   name = "vbatts/slackware"
 }
+
+#### Start containers
+resource "docker_container" "nixInstTestUbuntu" {
+  name  = "nixInstTestUbuntu"
+  image = "${docker_image.ubuntu.latest}"
+}
