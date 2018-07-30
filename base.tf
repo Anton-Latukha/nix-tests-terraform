@@ -65,6 +65,7 @@ resource "docker_container" "nixInstTestDebian" {
   volumes = {
     volume_name    = "nix204x8664"
     container_path = "/data"
+    read_only = true;
   }
 }
 
