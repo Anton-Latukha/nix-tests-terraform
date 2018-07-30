@@ -75,6 +75,8 @@ resource "docker_container" "nixInstTestUbuntu" {
   name  = "nixInstTestUbuntu"
   image = "${docker_image.ubuntu.latest}"
 
+  entrypoint = ["/data/install-new"]
+
   volumes = {
     volume_name    = "nix204x8664"
     container_path = "/data"
@@ -85,6 +87,8 @@ resource "docker_container" "nixInstTestUbuntu" {
 resource "docker_container" "nixInstTestCentos" {
   name  = "nixInstTestCentos"
   image = "${docker_image.centos.latest}"
+
+  entrypoint = ["/data/install-new"]
 
   volumes = {
     volume_name    = "nix204x8664"
@@ -97,6 +101,8 @@ resource "docker_container" "nixInstTestArchlinux" {
   name  = "nixInstTestArchlinux"
   image = "${docker_image.archlinux.latest}"
 
+  entrypoint = ["/data/install-new"]
+
   volumes = {
     volume_name    = "nix204x8664"
     container_path = "/data"
@@ -107,6 +113,8 @@ resource "docker_container" "nixInstTestArchlinux" {
 resource "docker_container" "nixInstTestAlpine" {
   name  = "nixInstTestAlpine"
   image = "${docker_image.alpine.latest}"
+
+  entrypoint = ["/data/install-new"]
 
   volumes = {
     volume_name    = "nix204x8664"
@@ -119,6 +127,8 @@ resource "docker_container" "nixInstTestOpensuse" {
   name  = "nixInstTestOpensuse"
   image = "${docker_image.opensuse.latest}"
 
+  entrypoint = ["/data/install-new"]
+
   volumes = {
     volume_name    = "nix204x8664"
     container_path = "/data"
@@ -129,6 +139,8 @@ resource "docker_container" "nixInstTestOpensuse" {
 resource "docker_container" "nixInstTestSlackware" {
   name  = "nixInstTestSlackware"
   image = "${docker_image.slackware.latest}"
+
+  entrypoint = ["/data/install-new"]
 
   volumes = {
     volume_name    = "nix204x8664"
