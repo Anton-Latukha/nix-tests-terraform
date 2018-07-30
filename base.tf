@@ -61,6 +61,11 @@ resource "docker_volume" "nix204x8664" {
 resource "docker_container" "nixInstTestDebian" {
   name  = "nixInstTestDebian"
   image = "${docker_image.debian.latest}"
+
+  volumes = {
+    volume_name    = "nix204x8664"
+    container_path = "/data"
+  }
 }
 
 resource "docker_container" "nixInstTestUbuntu" {
