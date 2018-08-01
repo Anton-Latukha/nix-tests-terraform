@@ -21,18 +21,6 @@ umask 022
 
 
 ###############################
-###  Main constants
-###############################
-{
-readonly dest='/nix'
-readonly self="$(dirname "$(realpath "$0")")"
-readonly nix="@nix@"
-readonly cacert="@cacert@"
-readonly appname="$0"
-}
-
-
-###############################
 ###  CLI control constants
 ###############################
 {
@@ -138,23 +126,31 @@ contactUs() {
 
 }
 
-
-oops() {
-    echo "$0:" "$@" >&2
-    exit 1
-}
-
 cleanup() {
-    rm -rf "$tmpDir"
+    rm -rf "$NIX_TMPDIR"
 }
 
-curl https://nixos.org/nix/install
 
-url="https://nixos.org/releases/nix/nix-2.0.4/nix-2.0.4-$system.tar.bz2"
+NIX_TMPDIR="$(mktemp -d -t nix-binary-tarball-unpack.XXXXXXXXXX)"
 
-tarball="$tmpDir/$(basename "$tmpDir/nix-2.0.4-$system.tar.bz2")"
-echo "downloading Nix 2.0.4 binary tarball for $system from '$url' to '$tmpDir'..."
-curl -L "$url" -o "$tarball" || oops "failed to download '$url'"
+cd "$NIX_TMPDIR" || error "Can not open $NIX_TMPDIR"
+
+curl -L https://nixos.org/nix/install -o one-liner.sh || error 'Couuld not download&save one-liner'
+
+NIX_ONELINER_SOURCE_URL="$(cat one-liner.sh | grep -e '^url=' | sed 's/^url=//g' | tr -d '"') || error 'one-liner.sh could not be parsed'"
+
+NIX_VER="$(grep -e '^url=' ./one-liner.sh | sed 's/^url=//g' | tr -d '"' | sed 's>^https://nixos.org/releases/nix/>>g' | cut -d'/' -f1)"
+
+
+
+NIX_SYSTEM='x86_64-linux'
+NIX_EXT='tar.bz2'
+NIX_TARBALL_FILENAME="$NIX_VER-$NIX_SYSTEM.$NIX_EXT"
+NIX_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_TARBALL_FILENAME"
+
+NIX_TARBALL_PATH="$NIX_TMPDIR/$(basename "$tmpDir/$NIX_TARBALL_FILENAME")"
+echo "downloading $NIX_VER binary tarball for $system from '$NIX_URL' to '$tmpDir'..."
+curl -L "$NIX_URL" -o "$tarball" || error "failed to download '$NIX_URL'"
 
 
 case "$(uname -s).$(uname -m)" in
@@ -163,12 +159,6 @@ case "$(uname -s).$(uname -m)" in
     *.i?86) system='i686-linux'; hash='b2e5b62a66c6d1951fdd5e01109680592b498ef40f28bfc790341f5b986ba34d';;
     *.aarch64) system='aarch64-linux'; hash='248be69c25f599ac214bad1e4f4003e27f1da83cb17f7cd762746bd2c215a0df';;
 esac
-
-NIX_VER='nix-2.0.2'
-
-NIX_SYSTEM='x86_64-linux'
-NIX_EXT='tar.bz2'
-NIX_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_VER-$NIX_SYSTEM.$NIX_EXT"
 
 mkdir ~/build
 cd ~/build
@@ -236,3 +226,16 @@ for n in $(seq 1 10); do useradd -c "Nix build user $n" -d /var/empty -g nixbld 
 \n\
 Source directory: '"$PWD"'\n'\
 > /etc/motd
+
+
+    ###############################
+    ###  Main constants
+    ###############################
+    {
+        readonly dest='/nix'
+        readonly self="$(dirname "$(realpath "$0")")"
+        readonly nix="@nix@"
+        readonly cacert="@cacert@"
+        readonly appname="$0"
+    }
+
