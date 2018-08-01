@@ -139,18 +139,17 @@ curl -L https://nixos.org/nix/install -o one-liner.sh || error 'Couuld not downl
 
 NIX_ONELINER_SOURCE_URL="$(cat one-liner.sh | grep -e '^url=' | sed 's/^url=//g' | tr -d '"') || error 'one-liner.sh could not be parsed'"
 
+# From one-liner 'url' variable determine Nix version, yes - it is hardcoded there in 'url' variable.
 NIX_VER="$(grep -e '^url=' ./one-liner.sh | sed 's/^url=//g' | tr -d '"' | sed 's>^https://nixos.org/releases/nix/>>g' | cut -d'/' -f1)"
-
-
 
 NIX_SYSTEM='x86_64-linux'
 NIX_EXT='tar.bz2'
 NIX_TARBALL_FILENAME="$NIX_VER-$NIX_SYSTEM.$NIX_EXT"
 NIX_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_TARBALL_FILENAME"
 
-NIX_TARBALL_PATH="$NIX_TMPDIR/$(basename "$tmpDir/$NIX_TARBALL_FILENAME")"
-echo "downloading $NIX_VER binary tarball for $system from '$NIX_URL' to '$tmpDir'..."
-curl -L "$NIX_URL" -o "$tarball" || error "failed to download '$NIX_URL'"
+NIX_TARBALL_PATH="$NIX_TMPDIR/$(basename "$NIX_TMPDIR/$NIX_TARBALL_FILENAME")"
+echo "downloading $NIX_VER binary tarball for $system from '$NIX_URL' to 'NIX_TMPDIR'..."
+curl -L "$NIX_URL" -o "$NIX_TARBALL_PATH" || error "failed to download '$NIX_URL' into '$NIX_TARBALL_PATH'"
 
 
 case "$(uname -s).$(uname -m)" in
