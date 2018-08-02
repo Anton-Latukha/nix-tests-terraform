@@ -160,22 +160,19 @@ case "$(uname -s).$(uname -m)" in
     *.aarch64) NIX_SYSTEM='aarch64-linux'; NIX_TARBALL_HASH="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | grep 'Linux.aarch64' | cut -d'=' -f3)";;
 esac
 
-mkdir ~/build
-cd ~/build
-
-# Clone current updated installation process
+# Clone updated installation
 git clone -b installFullProgress https://github.com/Anton-Latukha/nix.git installFullProgress
 
 # Download and extract official installation
 curl -L "$NIX_URL" -O
-tar xvf "$NIX_VER"-"$NIX_SYSTEM"."$NIX_EXT"
-rm "$NIX_VER"-"$NIX_SYSTEM"."$NIX_EXT"
+tar xvf "$NIX_TARBALL_FILENAME"
+rm "$NIX_TARBALL_FILENAME"
 
 # Copy updated instalation to nix install folder
 cp ./installFullProgress/scripts/install-nix-from-closure.sh ./"$NIX_VER"-"$NIX_SYSTEM"/install-new
 chmod u+x ./"$NIX_VER"-"$NIX_SYSTEM"/install-new
 
-cd "/root/build/$NIX_VER-$NIX_SYSTEM"
+cd "./$NIX_VER-$NIX_SYSTEM" || error "Can not go into $(pwd)/$NIX_VER-$NIX_SYSTEM"
 
 # Apply patch that populates build variables with relevant ones
 ## This is a patch
