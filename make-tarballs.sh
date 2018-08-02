@@ -220,10 +220,21 @@ NIX_DARWIN_64_VAR="$(grep '^nix=' "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64"/install 
 NIX_UNIX_64_VAR="$(grep '^nix=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64"/install | sed 's/^nix=//g' | tr -d '"')"
 NIX_UNIX_32_VAR="$(grep '^nix=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install | sed 's/^nix=//g' | tr -d '"')"
 NIX_UNIX_ARM_VAR="$(grep '^nix=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install | sed 's/^nix=//g' | tr -d '"')"
+
 NIX_DARWIN_64_CERT="$(grep '^cacert=' "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64"/install | sed 's/^cacert=//g' | tr -d '"')"
 NIX_UNIX_64_CERT="$(grep '^cacert=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64"/install | sed 's/^cacert=//g' | tr -d '"')"
 NIX_UNIX_32_CERT="$(grep '^cacert=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install | sed 's/^cacert=//g' | tr -d '"')"
 NIX_UNIX_ARM_CERT="$(grep '^cacert=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install | sed 's/^cacert=//g' | tr -d '"')"
+
+sed 's|^readonly nix=\".*\"|readonly nix='"$NIX_DARWIN_64_VAR"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64"/install-new
+sed 's|^readonly nix=\".*\"|readonly nix='"$NIX_UNIX_64_VAR"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64"/install-new
+sed 's|^readonly nix=\".*\"|readonly nix='"$NIX_UNIX_32_VAR"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install-new
+sed 's|^readonly nix=\".*\"|readonly nix='"$NIX_UNIX_ARM_VAR"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install-new
+
+sed 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_DARWIN_64_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64"/install-new
+sed 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_64_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64"/install-new
+sed 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_32_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install-new
+sed 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_ARM_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install-new
 
 cd "./$NIX_VER-$NIX_SYSTEM" || error "Can not go into $(pwd)/$NIX_VER-$NIX_SYSTEM"
 
