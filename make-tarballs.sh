@@ -142,28 +142,35 @@ NIX_ONELINER_SOURCE_URL="$(grep -e '^url=' ./one-liner.sh | sed 's/^url=//g' | t
 # From one-liner 'url' variable determine Nix version, yes - it is hardcoded there in 'url' variable.
 NIX_VER="$(grep -e '^url=' ./one-liner.sh | sed 's/^url=//g' | tr -d '"' | sed 's>^https://nixos.org/releases/nix/>>g' | cut -d'/' -f1)"
 
-NIX_SYSTEM='x86_64-linux'
+# Let's store and then process information from the Nix case block
+NIX_ONELINER_CASE_BLOCK="$(sed -n -e '/case "$(uname -s).$(uname -m)" in/,/esac/ p' ./one-liner.sh | grep -v '^case' | grep -v '^esac' | grep -v '^.*) oops'  | tr -d ';')"
+
+# Let's hardcode the archs and OSes Nix supports
+NIX_DARWIN_64='x86_64-darwin'
+NIX_UNIX_64='x86_64-linux'
+NIX_UNIX_32='i686-linux'
+NIX_UNIX_ARM='aarch64-linux'
+
+# Let's gather hashes for archs
+NIX_TARBALL_HASH_DARWIN_64="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | grep 'Darwin.x86_64' | cut -d'=' -f3)"
+NIX_TARBALL_HASH_UNIX_64="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK"   | grep 'Linux.x86_64'  | cut -d'=' -f3)"
+NIX_TARBALL_HASH_UNIX_32="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK"   | grep 'Linux.i?86'    | cut -d'=' -f3)"
+NIX_TARBALL_HASH_UNIX_ARM="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK"  | grep 'Linux.aarch64' | cut -d'=' -f3)"
+
 NIX_EXT='tar.bz2'
-NIX_TARBALL_FILENAME="$NIX_VER-$NIX_SYSTEM.$NIX_EXT"
-NIX_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_TARBALL_FILENAME"
+NIX_DARWIN_64_TARBALL_FILENAME="$NIX_VER-$NIX_DARWIN_64.$NIX_EXT"
+NIX_UNIX_64_TARBALL_FILENAME="$NIX_VER-$NIX_UNIX_64.$NIX_EXT"
+NIX_UNIX_32_TARBALL_FILENAME="$NIX_VER-$NIX_UNIX_32.$NIX_EXT"
+NIX_UNIX_ARM_TARBALL_FILENAME="$NIX_VER-$NIX_UNIX_ARM.$NIX_EXT"
+
+NIX_DARWIN_64_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_DARWIN_64_TARBALL_FILENAME"
+NIX_UNIX_64_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_UNIX_64_TARBALL_FILENAME"
+NIX_UNIX_32_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_UNIX_32_TARBALL_FILENAME"
+NIX_UNIX_ARM_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_UNIX_ARM_TARBALL_FILENAME"
 
 NIX_TARBALL_PATH="$NIX_TMPDIR/$(basename "$NIX_TMPDIR/$NIX_TARBALL_FILENAME")"
 echo "downloading $NIX_VER binary tarball for $system from '$NIX_URL' to 'NIX_TMPDIR'..."
 curl -L "$NIX_URL" -o "$NIX_TARBALL_PATH" || error "failed to download '$NIX_URL' into '$NIX_TARBALL_PATH'"
-
-NIX_ONELINER_CASE_BLOCK="$(sed -n -e '/case "$(uname -s).$(uname -m)" in/,/esac/ p' ./one-liner.sh | grep -v '^case' | grep -v '^esac' | grep -v '^.*) oops'  | tr -d ';')"
-
-case "$(uname -s).$(uname -m)" in
-    Darwin.x86_64) NIX_SYSTEM='x86_64-darwin'; NIX_TARBALL_HASH="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | 'grep Darwin.x86_64' | cut -d'=' -f3)";;
-    *.x86_64) NIX_SYSTEM='x86_64-linux'; NIX_TARBALL_HASH="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | grep 'Linux.x86_64' | cut -d'=' -f3)";;
-    *.i?86) NIX_SYSTEM='i686-linux'; NIX_TARBALL_HASH="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | grep 'Linux.i?86' | cut -d'=' -f3)";;
-    *.aarch64) NIX_SYSTEM='aarch64-linux'; NIX_TARBALL_HASH="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | grep 'Linux.aarch64' | cut -d'=' -f3)";;
-esac
-
-NIX_TARBALL_HASH_DARWIN_64="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | grep 'Darwin.x86_64' | cut -d'=' -f3)"
-NIX_TARBALL_HASH_UNIX_64="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK"   | grep 'Linux.x86_64'  | cut -d'=' -f3)"
-NIX_TARBALL_HASH_UNIX_86="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK"   | grep 'Linux.i?86'    | cut -d'=' -f3)"
-NIX_TARBALL_HASH_UNIX_ARM="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK"  | grep 'Linux.aarch64' | cut -d'=' -f3)"
 
 # Clone updated installation
 git clone -b installFullProgress https://github.com/Anton-Latukha/nix.git installFullProgress
