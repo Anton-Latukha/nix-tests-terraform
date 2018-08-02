@@ -154,10 +154,10 @@ curl -L "$NIX_URL" -o "$NIX_TARBALL_PATH" || error "failed to download '$NIX_URL
 NIX_ONELINER_CASE_BLOCK="$(sed -n -e '/case "$(uname -s).$(uname -m)" in/,/esac/ p' ./one-liner.sh | grep -v '^case' | grep -v '^esac' | grep -v '^.*) oops'  | tr -d ';')"
 
 case "$(uname -s).$(uname -m)" in
-    Darwin.x86_64) system='x86_64-darwin'; hash='ec6279bb6d628867d82a6e751dac2bcb64ccea3194d753756a309f75fd704d4c';;
-    *.x86_64) system='x86_64-linux'; hash='d6db178007014ed47ad5460c1bd5b2cb9403b1ec543a0d6507cb27e15358341f';;
-    *.i?86) system='i686-linux'; hash='b2e5b62a66c6d1951fdd5e01109680592b498ef40f28bfc790341f5b986ba34d';;
-    *.aarch64) system='aarch64-linux'; hash='248be69c25f599ac214bad1e4f4003e27f1da83cb17f7cd762746bd2c215a0df';;
+    Darwin.x86_64) NIX_SYSTEM='x86_64-darwin'; NIX_TARBALL_HASH="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | 'grep Darwin.x86_64' | cut -d'=' -f3)";;
+    *.x86_64) NIX_SYSTEM='x86_64-linux'; NIX_TARBALL_HASH="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | grep 'Linux.x86_64' | cut -d'=' -f3)";;
+    *.i?86) NIX_SYSTEM='i686-linux'; NIX_TARBALL_HASH="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | grep 'Linux.i?86' | cut -d'=' -f3)";;
+    *.aarch64) NIX_SYSTEM='aarch64-linux'; NIX_TARBALL_HASH="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | grep 'Linux.aarch64' | cut -d'=' -f3)";;
 esac
 
 mkdir ~/build
