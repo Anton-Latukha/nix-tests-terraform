@@ -160,6 +160,11 @@ case "$(uname -s).$(uname -m)" in
     *.aarch64) NIX_SYSTEM='aarch64-linux'; NIX_TARBALL_HASH="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | grep 'Linux.aarch64' | cut -d'=' -f3)";;
 esac
 
+NIX_TARBALL_HASH_DARWIN_64="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK" | grep 'Darwin.x86_64' | cut -d'=' -f3)"
+NIX_TARBALL_HASH_UNIX_64="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK"   | grep 'Linux.x86_64'  | cut -d'=' -f3)"
+NIX_TARBALL_HASH_UNIX_86="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK"   | grep 'Linux.i?86'    | cut -d'=' -f3)"
+NIX_TARBALL_HASH_UNIX_ARM="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK"  | grep 'Linux.aarch64' | cut -d'=' -f3)"
+
 # Clone updated installation
 git clone -b installFullProgress https://github.com/Anton-Latukha/nix.git installFullProgress
 
