@@ -140,7 +140,7 @@ curl -L https://nixos.org/nix/install -o one-liner.sh || error 'Couuld not downl
 NIX_ONELINER_SOURCE_URL="$(grep -e '^url=' ./one-liner.sh | sed 's/^url=//g' | tr -d '"') || error 'one-liner.sh could not be parsed'"
 
 # From one-liner 'url' variable determine Nix version, yes - it is hardcoded there in 'url' variable.
-NIX_VER="$(grep -e '^url=' ./one-liner.sh | sed 's/^url=//g' | tr -d '"' | sed 's>^https://nixos.org/releases/nix/>>g' | cut -d'/' -f1)"
+NIX_VER="$(printf "%s" "$NIX_ONELINER_SOURCE_URL" | sed 's>^https://nixos.org/releases/nix/>>g' | cut -d'/' -f1)"
 
 # Let's store and then process information from the Nix case block
 NIX_ONELINER_CASE_BLOCK="$(sed -n -e '/case "$(uname -s).$(uname -m)" in/,/esac/ p' ./one-liner.sh | grep -v '^case' | grep -v '^esac' | grep -v '^.*) oops'  | tr -d ';')"
@@ -168,21 +168,62 @@ NIX_UNIX_64_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_UNIX_64_TARBALL_FI
 NIX_UNIX_32_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_UNIX_32_TARBALL_FILENAME"
 NIX_UNIX_ARM_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_UNIX_ARM_TARBALL_FILENAME"
 
-NIX_TARBALL_PATH="$NIX_TMPDIR/$(basename "$NIX_TMPDIR/$NIX_TARBALL_FILENAME")"
-echo "downloading $NIX_VER binary tarball for $system from '$NIX_URL' to 'NIX_TMPDIR'..."
-curl -L "$NIX_URL" -o "$NIX_TARBALL_PATH" || error "failed to download '$NIX_URL' into '$NIX_TARBALL_PATH'"
+NIX_DARWIN_64_TARBALL_PATH="$NIX_TMPDIR/$NIX_DARWIN_64_TARBALL_FILENAME"
+NIX_UNIX_64_TARBALL_PATH="$NIX_TMPDIR/$NIX_UNIX_64_TARBALL_FILENAME"
+NIX_UNIX_32_TARBALL_PATH="$NIX_TMPDIR/$NIX_UNIX_32_TARBALL_FILENAME"
+NIX_UNIX_ARM_TARBALL_PATH="$NIX_TMPDIR/$NIX_UNIX_ARM_TARBALL_FILENAME"
+
+# Now let's download tarblalls
+
+notice "Downloading $NIX_VER binary tarball for $NIX_DARWIN_64 from '$NIX_DARWIN_64_URL' to 'NIX_TMPDIR'..."
+curl -L "$NIX_DARWIN_64_URL" -o "$NIX_DARWIN_64_TARBALL_PATH" || error "failed to download '$NIX_URL' into '$NIX_DARWIN_64_TARBALL_PATH'"
+
+notice "Downloading $NIX_VER binary tarball for $NIX_UNIX_64 from '$NIX_UNIX_64_URL' to 'NIX_TMPDIR'..."
+curl -L "$NIX_UNIX_64_URL" -o "$NIX_UNIX_64_TARBALL_PATH" || error "failed to download '$NIX_URL' into '$NIX_UNIX_64_TARBALL_PATH'"
+
+notice "Downloading $NIX_VER binary tarball for $NIX_UNIX_32 from '$NIX_UNIX_32_URL' to 'NIX_TMPDIR'..."
+curl -L "$NIX_UNIX_32_URL" -o "$NIX_UNIX_32_TARBALL_PATH" || error "failed to download '$NIX_URL' into '$NIX_UNIX_32_TARBALL_PATH'"
+
+notice "Downloading $NIX_VER binary tarball for $NIX_UNIX_ARM from '$NIX_UNIX_ARM_URL' to 'NIX_TMPDIR'..."
+curl -L "$NIX_UNIX_ARM_URL" -o "$NIX_UNIX_ARM_TARBALL_PATH" || error "failed to download '$NIX_URL' into '$NIX_UNIX_ARM_TARBALL_PATH'"
+
+# Download and extract official installation
+tar xvf "$NIX_DARWIN_64_TARBALL_FILENAME"
+rm "$NIX_DARWIN_64_TARBALL_FILENAME"
+
+tar xvf "$NIX_UNIX_64_TARBALL_FILENAME"
+rm "$NIX_UNIX_64_TARBALL_FILENAME"
+
+tar xvf "$NIX_UNIX_32_TARBALL_FILENAME"
+rm "$NIX_UNIX_32_TARBALL_FILENAME"
+
+tar xvf "$NIX_UNIX_ARM_TARBALL_FILENAME"
+rm "$NIX_UNIX_ARM_TARBALL_FILENAME"
 
 # Clone updated installation
 git clone -b installFullProgress https://github.com/Anton-Latukha/nix.git installFullProgress
 
-# Download and extract official installation
-curl -L "$NIX_URL" -O
-tar xvf "$NIX_TARBALL_FILENAME"
-rm "$NIX_TARBALL_FILENAME"
-
 # Copy updated instalation to nix install folder
-cp ./installFullProgress/scripts/install-nix-from-closure.sh ./"$NIX_VER"-"$NIX_SYSTEM"/install-new
-chmod u+x ./"$NIX_VER"-"$NIX_SYSTEM"/install-new
+cp ./installFullProgress/scripts/install-nix-from-closure.sh ./"$NIX_VER-$NIX_DARWIN_64"/install-new
+chmod u+x "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64"/install-new
+
+cp ./installFullProgress/scripts/install-nix-from-closure.sh ./"$NIX_VER-$NIX_UNIX_64"/install-new
+chmod u+x "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64"/install-new
+
+cp ./installFullProgress/scripts/install-nix-from-closure.sh ./"$NIX_VER-$NIX_UNIX_32"/install-new
+chmod u+x "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install-new
+
+cp ./installFullProgress/scripts/install-nix-from-closure.sh ./"$NIX_VER-$NIX_UNIX_ARM"/install-new
+chmod u+x "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install-new
+
+NIX_DARWIN_64_VAR="$(grep '^nix=' "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64"/install | sed 's/^nix=//g' | tr -d '"')"
+NIX_UNIX_64_VAR="$(grep '^nix=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64"/install | sed 's/^nix=//g' | tr -d '"')"
+NIX_UNIX_32_VAR="$(grep '^nix=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install | sed 's/^nix=//g' | tr -d '"')"
+NIX_UNIX_ARM_VAR="$(grep '^nix=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install | sed 's/^nix=//g' | tr -d '"')"
+NIX_DARWIN_64_CERT="$(grep '^cacert=' "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64"/install | sed 's/^cacert=//g' | tr -d '"')"
+NIX_UNIX_64_CERT="$(grep '^cacert=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64"/install | sed 's/^cacert=//g' | tr -d '"')"
+NIX_UNIX_32_CERT="$(grep '^cacert=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install | sed 's/^cacert=//g' | tr -d '"')"
+NIX_UNIX_ARM_CERT="$(grep '^cacert=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install | sed 's/^cacert=//g' | tr -d '"')"
 
 cd "./$NIX_VER-$NIX_SYSTEM" || error "Can not go into $(pwd)/$NIX_VER-$NIX_SYSTEM"
 
