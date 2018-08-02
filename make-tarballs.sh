@@ -137,7 +137,7 @@ cd "$NIX_TMPDIR" || error "Can not open $NIX_TMPDIR"
 
 curl -L https://nixos.org/nix/install -o one-liner.sh || error 'Couuld not download&save one-liner'
 
-NIX_ONELINER_SOURCE_URL="$(cat one-liner.sh | grep -e '^url=' | sed 's/^url=//g' | tr -d '"') || error 'one-liner.sh could not be parsed'"
+NIX_ONELINER_SOURCE_URL="$(grep -e '^url=' ./one-liner.sh | sed 's/^url=//g' | tr -d '"') || error 'one-liner.sh could not be parsed'"
 
 # From one-liner 'url' variable determine Nix version, yes - it is hardcoded there in 'url' variable.
 NIX_VER="$(grep -e '^url=' ./one-liner.sh | sed 's/^url=//g' | tr -d '"' | sed 's>^https://nixos.org/releases/nix/>>g' | cut -d'/' -f1)"
@@ -151,6 +151,7 @@ NIX_TARBALL_PATH="$NIX_TMPDIR/$(basename "$NIX_TMPDIR/$NIX_TARBALL_FILENAME")"
 echo "downloading $NIX_VER binary tarball for $system from '$NIX_URL' to 'NIX_TMPDIR'..."
 curl -L "$NIX_URL" -o "$NIX_TARBALL_PATH" || error "failed to download '$NIX_URL' into '$NIX_TARBALL_PATH'"
 
+NIX_ONELINER_CASE_BLOCK="$(sed -n -e '/case "$(uname -s).$(uname -m)" in/,/esac/ p' ./one-liner.sh | grep -v '^case' | grep -v '^esac' | grep -v '^.*) oops'  | tr -d ';')"
 
 case "$(uname -s).$(uname -m)" in
     Darwin.x86_64) system='x86_64-darwin'; hash='ec6279bb6d628867d82a6e751dac2bcb64ccea3194d753756a309f75fd704d4c';;
