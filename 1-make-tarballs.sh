@@ -20,6 +20,7 @@ umask 022
 }
 
 readonly self="$(dirname "$(realpath "$0")")"
+readonly appname="$0"
 
 ###############################
 ###  CLI control constants
