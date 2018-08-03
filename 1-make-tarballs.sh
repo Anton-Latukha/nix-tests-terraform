@@ -19,6 +19,7 @@ readonly LANG=C
 umask 022
 }
 
+readonly self="$(dirname "$(realpath "$0")")"
 
 ###############################
 ###  CLI control constants
@@ -236,28 +237,16 @@ sed -i 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_64_CERT"'|g' "$NIX
 sed -i 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_32_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install-new
 sed -i 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_ARM_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install-new
 
-# Banner
-echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/issue && cat /etc/motd' \
-    >> /etc/bash.bashrc \
-    ; echo '\033[1;32m\
-======================================================================\n\
-= Docker container for new Nix install demonstration for NixCon 2017 =\n\
-======================================================================\n\
-\n\
-Installation solves bugs of installator. It is tranparent to migrate to.\n\
-\n\
-Because it stays transparent to migrate upstream to - it also uses single\n\
-user Nix installation, as old does.\n\
-\n\
-And so it falls on nixbld group, because single user installation does\n\
-not requires nix workers by official documentation.\n\
-\n\
-Providing nixbld group and workers is a pure WND of expectations of Nix C++ code.\n\
-So it needs to be upplied manually:\n\
-\033[1;33m \n\
-######## Multiuser block: \n\
-groupadd -r nixbld\n\
-for n in $(seq 1 10); do useradd -c "Nix build user $n" -d /var/empty -g nixbld -G nixbld -M -N -r -s "$(which nologin)" "nixbld$n"; done\n\
-\033[0;m\
-########\n\
-'
+# Move tarballs to install folder, and then would clean-up TMPDIR
+mkdir "$self/ready-installer"
+mv "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64" "$self/ready-installer"
+mv "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64" "$self/ready-installer"
+mv "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32" "$self/ready-installer"
+mv "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM" "$self/ready-installer"
+
+mv "$self/hack.sh" "$self/ready-installer"
+chmod u+x "$self/ready-installer/hack.sh"
+mv "install-nix.sh" "$self/ready-installer"
+chmod u+x "$self/ready-installer/install-nix.sh"
+
+cleanup
