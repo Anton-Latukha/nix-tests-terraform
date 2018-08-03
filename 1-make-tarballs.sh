@@ -136,15 +136,15 @@ NIX_TMPDIR="$(mktemp -d -t nix-binary-tarball-unpack.XXXXXXXXXX)"
 
 cd "$NIX_TMPDIR" || error "Can not open $NIX_TMPDIR"
 
-curl -L https://nixos.org/nix/install -o one-liner.sh || error 'Couuld not download&save one-liner'
+curl -L https://nixos.org/nix/install -o "$NIX_TMPDIR"/one-liner.sh || error 'Couuld not download&save one-liner'
 
-NIX_ONELINER_SOURCE_URL="$(grep -e '^url=' ./one-liner.sh | sed 's/^url=//g' | tr -d '"') || error 'one-liner.sh could not be parsed'"
+NIX_ONELINER_SOURCE_URL="$(grep -e '^url=' "$NIX_TMPDIR"/one-liner.sh | sed 's/^url=//g' | tr -d '"') || error 'one-liner.sh could not be parsed'"
 
 # From one-liner 'url' variable determine Nix version, yes - it is hardcoded there in 'url' variable.
 NIX_VER="$(printf "%s" "$NIX_ONELINER_SOURCE_URL" | sed 's>^https://nixos.org/releases/nix/>>g' | cut -d'/' -f1)"
 
 # Let's store and then process information from the Nix case block
-NIX_ONELINER_CASE_BLOCK="$(sed -n -e '/case "$(uname -s).$(uname -m)" in/,/esac/ p' ./one-liner.sh | grep -v '^case' | grep -v '^esac' | grep -v '^.*) oops'  | tr -d ';')"
+NIX_ONELINER_CASE_BLOCK="$(sed -n -e '/case "$(uname -s).$(uname -m)" in/,/esac/ p' "$NIX_TMPDIR"/one-liner.sh | grep -v '^case' | grep -v '^esac' | grep -v '^.*) oops'  | tr -d ';')"
 
 # Let's hardcode the archs and OSes Nix supports
 NIX_DARWIN_64='x86_64-darwin'
@@ -243,6 +243,7 @@ mv -f "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64" "$self/ready-installer"
 mv -f "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64" "$self/ready-installer"
 mv -f "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32" "$self/ready-installer"
 mv -f "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM" "$self/ready-installer"
+cp -f "$NIX_TMPDIR/one-liner.sh" "$self/ready-installer"
 
 cp -f "$self/hack.sh" "$self/ready-installer"
 chmod u+x "$self/ready-installer/hack.sh"

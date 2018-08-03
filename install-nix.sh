@@ -124,8 +124,6 @@ contactUs() {
 
 "$self"/hack.sh
 
-# download official one-liner to gather version info from it.
-curl -L https://nixos.org/nix/install -o "$self"/one-liner.sh || error 'Couuld not download&save one-liner'
 NIX_ONELINER_SOURCE_URL="$(grep -e '^url=' "$self"/one-liner.sh | sed 's/^url=//g' | tr -d '"') || error 'one-liner.sh could not be parsed'"
 
 # From one-liner 'url' variable determine Nix version, yes - it is hardcoded there in 'url' variable.
