@@ -226,37 +226,15 @@ NIX_UNIX_64_CERT="$(grep '^cacert=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64"/install 
 NIX_UNIX_32_CERT="$(grep '^cacert=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install | sed 's/^cacert=//g' | tr -d '"')"
 NIX_UNIX_ARM_CERT="$(grep '^cacert=' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install | sed 's/^cacert=//g' | tr -d '"')"
 
-sed 's|^readonly nix=\".*\"|readonly nix='"$NIX_DARWIN_64_VAR"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64"/install-new
-sed 's|^readonly nix=\".*\"|readonly nix='"$NIX_UNIX_64_VAR"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64"/install-new
-sed 's|^readonly nix=\".*\"|readonly nix='"$NIX_UNIX_32_VAR"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install-new
-sed 's|^readonly nix=\".*\"|readonly nix='"$NIX_UNIX_ARM_VAR"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install-new
+sed -i 's|^readonly nix=\".*\"|readonly nix='"$NIX_DARWIN_64_VAR"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64"/install-new
+sed -i 's|^readonly nix=\".*\"|readonly nix='"$NIX_UNIX_64_VAR"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64"/install-new
+sed -i 's|^readonly nix=\".*\"|readonly nix='"$NIX_UNIX_32_VAR"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install-new
+sed -i 's|^readonly nix=\".*\"|readonly nix='"$NIX_UNIX_ARM_VAR"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install-new
 
-sed 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_DARWIN_64_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64"/install-new
-sed 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_64_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64"/install-new
-sed 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_32_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install-new
-sed 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_ARM_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install-new
-
-cd "./$NIX_VER-$NIX_SYSTEM" || error "Can not go into $(pwd)/$NIX_VER-$NIX_SYSTEM"
-
-# Apply patch that populates build variables with relevant ones
-## This is a patch
-echo '\
---- install-nix-from-closure.sh	2017-10-28 14:04:24.812532357 +0200\n\
-+++ install-nix-from-closure-new.sh	2017-10-28 14:03:49.104006041 +0200\n\
-@@ -89,8 +89,8 @@\n\
- {\n\
- readonly dest="/nix"\n\
- readonly self="$(dirname "$(realpath "$0")")"\n\
--readonly nix="@nix@"\n\
--readonly cacert="@cacert@"\n\
-+readonly nix="/nix/store/b4s1gxiis1ryvybnjhdjvgc5sr1nq0ys-nix-1.11.15"\n\
-+readonly cacert="/nix/store/28v6ma4zb887m7ldrbqh56r8jjxc53cb-nss-cacert-3.31"\n\
- readonly appname="$0"\n\
- }\n\
- ###############################\n\
-' >> git_to_deploy.patch
-## Applying
-patch install-new.sh git_to_deploy.patch
+sed -i 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_DARWIN_64_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64"/install-new
+sed -i 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_64_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64"/install-new
+sed -i 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_32_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32"/install-new
+sed -i 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_ARM_CERT"'|g' "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM"/install-new
 
 # Banner
 echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/issue && cat /etc/motd' \
@@ -282,21 +260,4 @@ groupadd -r nixbld\n\
 for n in $(seq 1 10); do useradd -c "Nix build user $n" -d /var/empty -g nixbld -G nixbld -M -N -r -s "$(which nologin)" "nixbld$n"; done\n\
 \033[0;m\
 ########\n\
-\n\
-(c) Anton Latukha, Serokell 2017 \n\
-\n\
-Source directory: '"$PWD"'\n'\
-> /etc/motd
-
-
-    ###############################
-    ###  Main constants
-    ###############################
-    {
-        readonly dest='/nix'
-        readonly self="$(dirname "$(realpath "$0")")"
-        readonly nix="@nix@"
-        readonly cacert="@cacert@"
-        readonly appname="$0"
-    }
-
+'
