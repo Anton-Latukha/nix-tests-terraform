@@ -50,6 +50,14 @@ resource "docker_image" "slackware" {
   name = "vbatts/slackware"
 }
 
+resource "docker_image" "android" {
+  name = "circleci/android:api-28-alpha"
+}
+
+resource "docker_image" "trisquel" {
+  name = "kpengboy/trisquel"
+}
+
 #### Volume
 ## FIXME: For now it needs to be populated manually. Move x86_64 tarball files inside volume
 resource "docker_volume" "nix204x8664" {
@@ -139,6 +147,33 @@ resource "docker_container" "nixInstTestOpensuse" {
 resource "docker_container" "nixInstTestSlackware" {
   name  = "nixInstTestSlackware"
   image = "${docker_image.slackware.latest}"
+
+  entrypoint = ["/data/install-nix.sh"]
+
+  volumes = {
+    volume_name    = "nix204x8664"
+    container_path = "/data"
+    read_only      = true
+  }
+}
+
+resource "docker_container" "nixInstTestAndroid" {
+  name  = "nixInstTestAndroid"
+  image = "${docker_image.android.latest}"
+
+  entrypoint = ["/usr/bin/sudo", "/data/install-nix.sh"]
+
+  volumes = {
+    volume_name    = "nix204x8664"
+    container_path = "/data"
+
+    read_only = true
+  }
+}
+
+resource "docker_container" "nixInstTestTrisquel" {
+  name  = "nixInstTestTrisquel"
+  image = "${docker_image.trisquel.latest}"
 
   entrypoint = ["/data/install-nix.sh"]
 
