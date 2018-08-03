@@ -239,14 +239,14 @@ sed -i 's|^readonly cacert=\".*\"|readonly cacert='"$NIX_UNIX_ARM_CERT"'|g' "$NI
 
 # Move tarballs to install folder, and then would clean-up TMPDIR
 mkdir "$self/ready-installer"
-mv "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64" "$self/ready-installer"
-mv "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64" "$self/ready-installer"
-mv "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32" "$self/ready-installer"
-mv "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM" "$self/ready-installer"
+mv -f "$NIX_TMPDIR/$NIX_VER-$NIX_DARWIN_64" "$self/ready-installer"
+mv -f "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_64" "$self/ready-installer"
+mv -f "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_32" "$self/ready-installer"
+mv -f "$NIX_TMPDIR/$NIX_VER-$NIX_UNIX_ARM" "$self/ready-installer"
 
-mv "$self/hack.sh" "$self/ready-installer"
+cp -f "$self/hack.sh" "$self/ready-installer"
 chmod u+x "$self/ready-installer/hack.sh"
-mv "install-nix.sh" "$self/ready-installer"
+cp -f "$self/install-nix.sh" "$self/ready-installer"
 chmod u+x "$self/ready-installer/install-nix.sh"
 
 cleanup
