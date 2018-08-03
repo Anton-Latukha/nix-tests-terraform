@@ -1,3 +1,5 @@
+This repo is supportive testing suite to the POSIX-compatile Nix installer, what resides [here](https://github.com/NixOS/nix/pull/1565).
+
 #### 1. Create tarballs
 Have a `curl`, `git` installed.
 
