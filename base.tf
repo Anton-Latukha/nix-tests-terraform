@@ -186,24 +186,41 @@ resource "docker_container" "nixInstTestTrisquel" {
 
 ### QEMU/KVM libvirt
 
-# Declare the provider
+######################
+### Declare the provider
+
 provider "libvirt" {
   uri = "qemu:///system"
 }
 
-# Create a basic virtual network for libVirt resources
+######################
+### Basic virtual network for libVirt
+
 resource "libvirt_network" "default" {
   name      = "default"
   addresses = ["192.168.122.0/24"]
 }
 
-# Fetch the latest Ubuntu release image
+######################
+### Cloud volumes
+
+# Ubuntu (it is a draft)
 resource "libvirt_volume" "ubuntu-volume" {
   name   = "ubuntu-volume"
   pool   = "default"
   source = "https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img"
   format = "qcow2"
 }
+
+# FreeBSD
+resource "libvirt_volume" "freebsd-volume" {
+  name   = "freebsd-volume"
+  pool   = "default"
+  source = "http://ftp.freebsd.org/pub/FreeBSD/releases/VM-IMAGES/11.2-RELEASE/amd64/Latest/FreeBSD-11.2-RELEASE-amd64.qcow2.xz"
+  format = "qcow2.xz"
+}
+
+######################
 
 # Use CloudInit to add our ssh-key to the instance
 resource "libvirt_cloudinit" "commoninit" {
@@ -213,9 +230,46 @@ resource "libvirt_cloudinit" "commoninit" {
   ssh_authorized_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMLbPtWNZwNZp0H/P+jsIqtib0IK/SZ2KOypM+EgW+UM pyro@rogue"
 }
 
-# Create the machine
+######################
+### VMs
+
+# Ubuntu
 resource "libvirt_domain" "nix-ubuntu" {
   name   = "nix-ubuntu"
+  memory = "512"
+  vcpu   = 1
+
+  cloudinit = "${libvirt_cloudinit.commoninit.id}"
+
+  network_interface {
+    network_name = "default"
+  }
+
+  console {
+    type        = "pty"
+    target_port = "0"
+    target_type = "serial"
+  }
+
+  console {
+    type        = "pty"
+    target_type = "virtio"
+    target_port = "1"
+  }
+
+  disk {
+    volume_id = "${libvirt_volume.ubuntu-volume.id}"
+  }
+
+  graphics {
+    type        = "spice"
+    listen_type = "address"
+    autoport    = true
+  }
+}
+
+resource "libvirt_domain" "nix-freebsd" {
+  name   = "nix-freebsd"
   memory = "512"
   vcpu   = 1
 
@@ -241,7 +295,7 @@ resource "libvirt_domain" "nix-ubuntu" {
   }
 
   disk {
-    volume_id = "${libvirt_volume.ubuntu-volume.id}"
+    volume_id = "${libvirt_volume.freebsd-volume.id}"
   }
 
   graphics {
@@ -253,6 +307,10 @@ resource "libvirt_domain" "nix-ubuntu" {
 
 # Print the Boxes IP
 # Note: you can use `virsh domifaddr <vm_name> <interface>` to get the ip later
-output "ip" {
+output "ubuntu@nix-ubuntu: " {
   value = "${libvirt_domain.nix-ubuntu.network_interface.0.addresses.0}"
+}
+
+output "freebsd@nix-freebsd: " {
+  value = "${libvirt_domain.nix-freebsd.network_interface.0.addresses.0}"
 }
