@@ -28,3 +28,9 @@ That directory `./ready-installer` - should be used as a volume to mount or be c
 
 #### 3. Run installer
 Run `install-nix.sh`, which would then run `install-new` - the POSIX installer which is under test.
+
+#### To use the full automated pipeline
+1. Install `terraform`, `terraform-provider-libvirt`, `cdrtools`.
+2. In a repo directory run `terraform init -plugin-dir /run/current-system/sw/bin/`.
+3. Run `terraform plan` observe changes.
+4. Run `terraform apply`.
