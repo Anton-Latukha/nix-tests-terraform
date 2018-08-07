@@ -34,3 +34,4 @@ Run `install-nix.sh`, which would then run `install-new` - the POSIX installer w
 2. In a repo directory run `terraform init -plugin-dir /run/current-system/sw/bin/`.
 3. Run `terraform plan` observe changes.
 4. Run `terraform apply`.
+5. If `libVirt` complains that virtual network is not active - enable `virt-manager > edit > connection details > virtual networks > {network name} > Autostart: + On boot`. Or in your KVM UI/CLI tool of choise. Or change the virtual network name to one you are using.
