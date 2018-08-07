@@ -216,8 +216,8 @@ resource "libvirt_volume" "ubuntu-volume" {
 resource "libvirt_volume" "freebsd-volume" {
   name   = "freebsd-volume"
   pool   = "default"
-  source = "http://ftp.freebsd.org/pub/FreeBSD/releases/VM-IMAGES/11.2-RELEASE/amd64/Latest/FreeBSD-11.2-RELEASE-amd64.qcow2.xz"
-  format = "qcow2.xz"
+  source = "./freebsd/FreeBSD-11.2-RELEASE-amd64.qcow2"
+  format = "qcow2"
 }
 
 ######################
