@@ -186,41 +186,43 @@ resource "docker_container" "nixInstTestTrisquel" {
 
 ### QEMU/KVM libvirt
 
-# instance the provider
+# Declare the provider
 provider "libvirt" {
   uri = "qemu:///system"
 }
 
-# Fetch the latest ubuntu release image from their mirrors
-resource "libvirt_volume" "ubuntu-qcow2" {
-  name   = "ubuntu-qcow2"
+# Create a basic virtual network for libVirt resources
+resource "libvirt_network" "default" {
+  name      = "default"
+  addresses = ["192.168.122.0/24"]
+}
+
+# Fetch the latest Ubuntu release image
+resource "libvirt_volume" "ubuntu-volume" {
+  name   = "ubuntu-volume"
   pool   = "default"
   source = "https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img"
   format = "qcow2"
 }
 
-# Create a network for our VMs
-resource "libvirt_network" "vm_network" {
-  name      = "vm_network"
-  addresses = ["10.0.1.0/24"]
-}
-
 # Use CloudInit to add our ssh-key to the instance
 resource "libvirt_cloudinit" "commoninit" {
-  name               = "commoninit.iso"
+  name = "commoninit.iso"
+
+  # NOTE: Hey, place your own key! All right?
   ssh_authorized_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMLbPtWNZwNZp0H/P+jsIqtib0IK/SZ2KOypM+EgW+UM pyro@rogue"
 }
 
 # Create the machine
-resource "libvirt_domain" "domain-ubuntu" {
-  name   = "ubuntu-terraform"
+resource "libvirt_domain" "nix-ubuntu" {
+  name   = "nix-ubuntu"
   memory = "512"
   vcpu   = 1
 
   cloudinit = "${libvirt_cloudinit.commoninit.id}"
 
   network_interface {
-    network_name = "vm_network"
+    network_name = "default"
   }
 
   # IMPORTANT
@@ -239,7 +241,7 @@ resource "libvirt_domain" "domain-ubuntu" {
   }
 
   disk {
-    volume_id = "${libvirt_volume.ubuntu-qcow2.id}"
+    volume_id = "${libvirt_volume.ubuntu-volume.id}"
   }
 
   graphics {
@@ -252,5 +254,5 @@ resource "libvirt_domain" "domain-ubuntu" {
 # Print the Boxes IP
 # Note: you can use `virsh domifaddr <vm_name> <interface>` to get the ip later
 output "ip" {
-  value = "${libvirt_domain.domain-ubuntu.network_interface.0.addresses.0}"
+  value = "${libvirt_domain.nix-ubuntu.network_interface.0.addresses.0}"
 }
