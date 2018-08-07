@@ -62,6 +62,10 @@ resource "docker_image" "trisquel" {
 ## FIXME: For now it needs to be populated manually. Move x86_64 tarball files inside volume
 resource "docker_volume" "nix204x8664" {
   name = "nix204x8664"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 #### Start containers
