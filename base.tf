@@ -204,6 +204,10 @@ provider "libvirt" {
 resource "libvirt_network" "default" {
   name      = "default"
   addresses = ["192.168.122.0/24"]
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 ######################
