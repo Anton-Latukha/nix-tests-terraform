@@ -1,0 +1,10 @@
+/terraform.tfstate
+/terraform.tfstate.backup
+/.terraform.tfstate.lock.info
+/.terraform/*
+/freebsd/*
+/openbsd/*
+/trueos/*
+/netbsd/*
+/dragonflybsd/*
+/ready-installer/*
