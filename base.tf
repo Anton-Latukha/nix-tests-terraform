@@ -43,11 +43,11 @@ resource "docker_image" "alpine" {
 }
 
 resource "docker_image" "opensuse" {
-  name = "opensuse/leap"
+  name = "opensuse/leap:latest"
 }
 
 resource "docker_image" "slackware" {
-  name = "vbatts/slackware"
+  name = "vbatts/slackware:latest"
 }
 
 resource "docker_image" "android" {
@@ -55,7 +55,7 @@ resource "docker_image" "android" {
 }
 
 resource "docker_image" "trisquel" {
-  name = "kpengboy/trisquel"
+  name = "kpengboy/trisquel:latest"
 }
 
 #### Volume
