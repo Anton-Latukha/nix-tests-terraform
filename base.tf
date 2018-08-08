@@ -184,7 +184,8 @@ resource "docker_container" "nixInstTestTrisquel" {
   volumes = {
     volume_name    = "nix204x8664"
     container_path = "/data"
-    read_only      = true
+
+    read_only = true
   }
 }
 
@@ -221,6 +222,14 @@ resource "libvirt_volume" "freebsd-volume" {
   name   = "freebsd-volume"
   pool   = "default"
   source = "./freebsd/FreeBSD-11.2-RELEASE-amd64.qcow2"
+  format = "qcow2"
+}
+
+# OpenBSD
+resource "libvirt_volume" "openbsd-volume" {
+  name   = "openbsd-volume"
+  pool   = "default"
+  source = "./openbsd/install63.fs"
   format = "qcow2"
 }
 
@@ -277,31 +286,25 @@ resource "libvirt_domain" "nix-freebsd" {
   memory = "512"
   vcpu   = 1
 
-  cloudinit = "${libvirt_cloudinit.commoninit.id}"
+  #TODO:
+  #cloudinit = "${libvirt_cloudinit.commoninit.id}"
 
   network_interface {
     network_name = "default"
   }
-
-  # IMPORTANT
-  # Ubuntu can hang if an isa-serial is not present at boot time.
-  # If you find your CPU 100% and never is available this is why
   console {
     type        = "pty"
     target_port = "0"
     target_type = "serial"
   }
-
   console {
     type        = "pty"
     target_type = "virtio"
     target_port = "1"
   }
-
   disk {
     volume_id = "${libvirt_volume.freebsd-volume.id}"
   }
-
   graphics {
     type        = "spice"
     listen_type = "address"
@@ -309,7 +312,40 @@ resource "libvirt_domain" "nix-freebsd" {
   }
 }
 
-# Print the Boxes IP
+resource "libvirt_domain" "nix-openbsd" {
+  name   = "nix-openbsd"
+  memory = "512"
+  vcpu   = 1
+
+  #TODO:
+  #cloudinit = "${libvirt_cloudinit.commoninit.id}"
+
+  network_interface {
+    network_name = "default"
+  }
+  console {
+    type        = "pty"
+    target_port = "0"
+    target_type = "serial"
+  }
+  console {
+    type        = "pty"
+    target_type = "virtio"
+    target_port = "1"
+  }
+  disk {
+    volume_id = "${libvirt_volume.openbsd-volume.id}"
+  }
+  graphics {
+    type        = "spice"
+    listen_type = "address"
+    autoport    = true
+  }
+}
+
+######################
+### Print information
+
 # Note: you can use `virsh domifaddr <vm_name> <interface>` to get the ip later
 output "ubuntu@nix-ubuntu: " {
   value = "${libvirt_domain.nix-ubuntu.network_interface.0.addresses.0}"
