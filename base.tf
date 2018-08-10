@@ -298,6 +298,8 @@ output "freebsd@nix-freebsd: " {
   value = "${libvirt_domain.nix-freebsd.network_interface.0.addresses.0}"
 }
 
-output "ubuntu@nix-openbsd: " {
-  value = "${libvirt_domain.nix-openbsd.network_interface.0.addresses.0}"
-}
+#TODO:
+#output "openbsdd@nix-openbsd: " {
+#  value = "${libvirt_domain.nix-openbsd.network_interface.0.addresses.0}"
+#}
+
