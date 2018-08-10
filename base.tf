@@ -1,20 +1,3 @@
-# # An AMI
-# variable "ami" {
-#   description = "the AMI to use"
-# }
-
-# /* A multi
-#    line comment. */
-# resource "aws_instance" "web" {
-#   ami               = "${var.ami}"
-#   count             = 2
-#   source_dest_check = false
-
-#   connection {
-#     user = "root"
-#   }
-# }
-
 # Configure the Docker provider
 provider "docker" {
   host = "tcp://127.0.0.1:2376"
@@ -213,19 +196,11 @@ resource "libvirt_network" "default" {
 ######################
 ### Cloud volumes
 
-# Ubuntu (it is a draft)
-resource "libvirt_volume" "ubuntu-volume" {
-  name   = "ubuntu-volume"
-  pool   = "default"
-  source = "https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.img"
-  format = "qcow2"
-}
-
 # FreeBSD
 resource "libvirt_volume" "freebsd-volume" {
   name   = "freebsd-volume"
   pool   = "default"
-  source = "./freebsd/FreeBSD-11.2-RELEASE-amd64.qcow2"
+  source = "./freebsd/freebsd.qcow2"
   format = "qcow2"
 }
 
@@ -233,7 +208,7 @@ resource "libvirt_volume" "freebsd-volume" {
 resource "libvirt_volume" "openbsd-volume" {
   name   = "openbsd-volume"
   pool   = "default"
-  source = "./openbsd/install63.fs"
+  source = "./openbsd/install63.qcow2"
   format = "qcow2"
 }
 
@@ -250,65 +225,32 @@ resource "libvirt_cloudinit" "commoninit" {
 ######################
 ### VMs
 
-# Ubuntu
-resource "libvirt_domain" "nix-ubuntu" {
-  name   = "nix-ubuntu"
-  memory = "512"
-  vcpu   = 1
-
-  cloudinit = "${libvirt_cloudinit.commoninit.id}"
-
-  network_interface {
-    network_name = "default"
-  }
-
-  console {
-    type        = "pty"
-    target_port = "0"
-    target_type = "serial"
-  }
-
-  console {
-    type        = "pty"
-    target_type = "virtio"
-    target_port = "1"
-  }
-
-  disk {
-    volume_id = "${libvirt_volume.ubuntu-volume.id}"
-  }
-
-  graphics {
-    type        = "spice"
-    listen_type = "address"
-    autoport    = true
-  }
-}
-
+# FreeBSD
 resource "libvirt_domain" "nix-freebsd" {
   name   = "nix-freebsd"
   memory = "512"
   vcpu   = 1
 
-  #TODO:
-  #cloudinit = "${libvirt_cloudinit.commoninit.id}"
-
   network_interface {
     network_name = "default"
   }
+
   console {
     type        = "pty"
     target_port = "0"
     target_type = "serial"
   }
+
   console {
     type        = "pty"
     target_type = "virtio"
     target_port = "1"
   }
+
   disk {
     volume_id = "${libvirt_volume.freebsd-volume.id}"
   }
+
   graphics {
     type        = "spice"
     listen_type = "address"
@@ -316,30 +258,32 @@ resource "libvirt_domain" "nix-freebsd" {
   }
 }
 
+# OpenBSD
 resource "libvirt_domain" "nix-openbsd" {
   name   = "nix-openbsd"
   memory = "512"
   vcpu   = 1
 
-  #TODO:
-  #cloudinit = "${libvirt_cloudinit.commoninit.id}"
-
   network_interface {
     network_name = "default"
   }
+
   console {
     type        = "pty"
     target_port = "0"
     target_type = "serial"
   }
+
   console {
     type        = "pty"
     target_type = "virtio"
     target_port = "1"
   }
+
   disk {
     volume_id = "${libvirt_volume.openbsd-volume.id}"
   }
+
   graphics {
     type        = "spice"
     listen_type = "address"
@@ -350,11 +294,10 @@ resource "libvirt_domain" "nix-openbsd" {
 ######################
 ### Print information
 
-# Note: you can use `virsh domifaddr <vm_name> <interface>` to get the ip later
-output "ubuntu@nix-ubuntu: " {
-  value = "${libvirt_domain.nix-ubuntu.network_interface.0.addresses.0}"
-}
-
 output "freebsd@nix-freebsd: " {
   value = "${libvirt_domain.nix-freebsd.network_interface.0.addresses.0}"
+}
+
+output "ubuntu@nix-openbsd: " {
+  value = "${libvirt_domain.nix-openbsd.network_interface.0.addresses.0}"
 }
