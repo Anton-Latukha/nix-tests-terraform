@@ -3,7 +3,7 @@ This repo is supportive testing suite to the POSIX-compatile Nix installer, what
 #### 1. Create tarballs
 Have a `curl`, `git` installed.
 
-Run `1-make-tarballs.sh`. Script:
+Run `1-make-tarballs.sh`. Script would:
 
 1a. Creates temporary directory in `/tmp`
 
@@ -36,3 +36,22 @@ Run `install-nix.sh`, which would then run `install-new` - the POSIX installer w
 4. Run `terraform apply`.
 5. If `libVirt` complains that virtual network is not active - enable `virt-manager > edit > connection details > virtual networks > {network name} > Autostart: + On boot`. Or in your KVM UI/CLI tool of choise. Or change the virtual network name to one you are using.
 6. To found KVM IPs - `terraform show`.
+
+#### Multi-OS Testing using Terraform
+Install Docker.
+
+```shell
+cd tf-linux-containers
+terraform init
+terraform apply
+# Confirm typing: yes
+```
+
+Terraform would run all the containers described in `main.tf`.
+```shell
+# See the state of containers:
+docker ps -a
+# See test run results with:
+docker logs <container name or ID>
+# If the installation gone successfully - installer reports it.
+```
