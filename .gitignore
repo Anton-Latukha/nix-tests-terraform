@@ -2,3 +2,4 @@
 terraform.tfstate
 terraform.tfstate.backup
 ready-installer
+/tf-bsd-qemu-vms/img/*
