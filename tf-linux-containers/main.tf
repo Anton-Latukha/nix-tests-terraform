@@ -1,7 +1,14 @@
-# Configure the Docker provider
-provider "docker" {
-  host = "tcp://127.0.0.1:2376"
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+    }
+  }
 }
+# Configure the Docker provider
+#provider "docker" {
+#  host = "tcp://127.0.0.1:2376"
+#}
 
 #### Funcking Images
 
@@ -18,7 +25,7 @@ resource "docker_image" "centos" {
 }
 
 resource "docker_image" "archlinux" {
-  name = "base/archlinux:latest"
+  name = "archlinux:latest"
 }
 
 resource "docker_image" "alpine" {
@@ -51,11 +58,11 @@ resource "docker_volume" "nix204x8664" {
 
 resource "docker_container" "nixInstTestDebian" {
   name  = "nixInstTestDebian"
-  image = "${docker_image.debian.latest}"
+  image = docker_image.debian.latest
 
   entrypoint = ["/data/install-nix.sh"]
 
-  volumes = {
+  volumes {
     volume_name    = "nix204x8664"
     container_path = "/data"
     read_only      = true
@@ -64,11 +71,11 @@ resource "docker_container" "nixInstTestDebian" {
 
 resource "docker_container" "nixInstTestUbuntu" {
   name  = "nixInstTestUbuntu"
-  image = "${docker_image.ubuntu.latest}"
+  image = docker_image.ubuntu.latest
 
   entrypoint = ["/data/install-nix.sh"]
 
-  volumes = {
+  volumes {
     volume_name    = "nix204x8664"
     container_path = "/data"
     read_only      = true
@@ -77,11 +84,11 @@ resource "docker_container" "nixInstTestUbuntu" {
 
 resource "docker_container" "nixInstTestCentos" {
   name  = "nixInstTestCentos"
-  image = "${docker_image.centos.latest}"
+  image = docker_image.centos.latest
 
   entrypoint = ["/data/install-nix.sh"]
 
-  volumes = {
+  volumes {
     volume_name    = "nix204x8664"
     container_path = "/data"
     read_only      = true
@@ -90,11 +97,11 @@ resource "docker_container" "nixInstTestCentos" {
 
 resource "docker_container" "nixInstTestArchlinux" {
   name  = "nixInstTestArchlinux"
-  image = "${docker_image.archlinux.latest}"
+  image = docker_image.archlinux.latest
 
   entrypoint = ["/data/install-nix.sh"]
 
-  volumes = {
+  volumes {
     volume_name    = "nix204x8664"
     container_path = "/data"
     read_only      = true
@@ -103,11 +110,11 @@ resource "docker_container" "nixInstTestArchlinux" {
 
 resource "docker_container" "nixInstTestAlpine" {
   name  = "nixInstTestAlpine"
-  image = "${docker_image.alpine.latest}"
+  image = docker_image.alpine.latest
 
   entrypoint = ["/data/install-nix.sh"]
 
-  volumes = {
+  volumes {
     volume_name    = "nix204x8664"
     container_path = "/data"
     read_only      = true
@@ -116,11 +123,11 @@ resource "docker_container" "nixInstTestAlpine" {
 
 resource "docker_container" "nixInstTestOpensuse" {
   name  = "nixInstTestOpensuse"
-  image = "${docker_image.opensuse.latest}"
+  image = docker_image.opensuse.latest
 
   entrypoint = ["/data/install-nix.sh"]
 
-  volumes = {
+  volumes {
     volume_name    = "nix204x8664"
     container_path = "/data"
     read_only      = true
@@ -129,11 +136,11 @@ resource "docker_container" "nixInstTestOpensuse" {
 
 resource "docker_container" "nixInstTestSlackware" {
   name  = "nixInstTestSlackware"
-  image = "${docker_image.slackware.latest}"
+  image = docker_image.slackware.latest
 
   entrypoint = ["/data/install-nix.sh"]
 
-  volumes = {
+  volumes {
     volume_name    = "nix204x8664"
     container_path = "/data"
     read_only      = true
@@ -142,11 +149,11 @@ resource "docker_container" "nixInstTestSlackware" {
 
 resource "docker_container" "nixInstTestAndroid" {
   name  = "nixInstTestAndroid"
-  image = "${docker_image.android.latest}"
+  image = docker_image.android.latest
 
   entrypoint = ["/usr/bin/sudo", "/data/install-nix.sh"]
 
-  volumes = {
+  volumes {
     volume_name    = "nix204x8664"
     container_path = "/data"
 
@@ -156,11 +163,11 @@ resource "docker_container" "nixInstTestAndroid" {
 
 resource "docker_container" "nixInstTestTrisquel" {
   name  = "nixInstTestTrisquel"
-  image = "${docker_image.trisquel.latest}"
+  image = docker_image.trisquel.latest
 
   entrypoint = ["/data/install-nix.sh"]
 
-  volumes = {
+  volumes {
     volume_name    = "nix204x8664"
     container_path = "/data"
 

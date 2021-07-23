@@ -9,6 +9,7 @@
 ###############################
 ###  Setup environment
 ###############################
+set -x
 {
 # Set the character collating sequence to be numeric ASCII/C standard.
 # Set the character set to be standard one-byte ASCII.
@@ -139,10 +140,10 @@ cd "$NIX_TMPDIR" || error "Can not open $NIX_TMPDIR"
 
 curl -L https://nixos.org/nix/install -o "$NIX_TMPDIR"/one-liner.sh || error 'Couuld not download&save one-liner'
 
-NIX_ONELINER_SOURCE_URL="$(grep -e '^url=' "$NIX_TMPDIR"/one-liner.sh | sed 's/^url=//g' | tr -d '"') || error 'one-liner.sh could not be parsed'"
+NIX_ONELINER_SOURCE_URL=$(grep -e '^url=' "$NIX_TMPDIR"/one-liner.sh | sed 's/^url=//g' | tr -d '"')
 
 # From one-liner 'url' variable determine Nix version, yes - it is hardcoded there in 'url' variable.
-NIX_VER="$(printf "%s" "$NIX_ONELINER_SOURCE_URL" | sed 's>^https://nixos.org/releases/nix/>>g' | cut -d'/' -f1)"
+NIX_VER="$(printf "%s" "$NIX_ONELINER_SOURCE_URL" | sed 's>^https://releases.nixos.org/nix/>>g' | cut -d'/' -f1)"
 
 # Let's store and then process information from the Nix case block
 NIX_ONELINER_CASE_BLOCK="$(sed -n -e '/case "$(uname -s).$(uname -m)" in/,/esac/ p' "$NIX_TMPDIR"/one-liner.sh | grep -v '^case' | grep -v '^esac' | grep -v '^.*) oops'  | tr -d ';')"
@@ -159,16 +160,16 @@ NIX_TARBALL_HASH_UNIX_64="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK"   | grep 'Lin
 NIX_TARBALL_HASH_UNIX_32="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK"   | grep 'Linux.i?86'    | cut -d'=' -f3)"
 NIX_TARBALL_HASH_UNIX_ARM="$(printf "%s" "$NIX_ONELINER_CASE_BLOCK"  | grep 'Linux.aarch64' | cut -d'=' -f3)"
 
-NIX_EXT='tar.bz2'
+NIX_EXT='tar.xz'
 NIX_DARWIN_64_TARBALL_FILENAME="$NIX_VER-$NIX_DARWIN_64.$NIX_EXT"
 NIX_UNIX_64_TARBALL_FILENAME="$NIX_VER-$NIX_UNIX_64.$NIX_EXT"
 NIX_UNIX_32_TARBALL_FILENAME="$NIX_VER-$NIX_UNIX_32.$NIX_EXT"
 NIX_UNIX_ARM_TARBALL_FILENAME="$NIX_VER-$NIX_UNIX_ARM.$NIX_EXT"
 
-NIX_DARWIN_64_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_DARWIN_64_TARBALL_FILENAME"
-NIX_UNIX_64_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_UNIX_64_TARBALL_FILENAME"
-NIX_UNIX_32_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_UNIX_32_TARBALL_FILENAME"
-NIX_UNIX_ARM_URL="https://nixos.org/releases/nix/$NIX_VER/$NIX_UNIX_ARM_TARBALL_FILENAME"
+NIX_DARWIN_64_URL="https://releases.nixos.org/nix/$NIX_VER/$NIX_DARWIN_64_TARBALL_FILENAME"
+NIX_UNIX_64_URL="https://releases.nixos.org/nix/$NIX_VER/$NIX_UNIX_64_TARBALL_FILENAME"
+NIX_UNIX_32_URL="https://releases.nixos.org/nix/$NIX_VER/$NIX_UNIX_32_TARBALL_FILENAME"
+NIX_UNIX_ARM_URL="https://releases.nixos.org/nix/$NIX_VER/$NIX_UNIX_ARM_TARBALL_FILENAME"
 
 NIX_DARWIN_64_TARBALL_PATH="$NIX_TMPDIR/$NIX_DARWIN_64_TARBALL_FILENAME"
 NIX_UNIX_64_TARBALL_PATH="$NIX_TMPDIR/$NIX_UNIX_64_TARBALL_FILENAME"
